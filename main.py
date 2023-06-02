@@ -9,10 +9,15 @@ from components.create_excel import (
     create_excel_file,
     create_table,
 )
+from components.update_json import update_package_json
+from components.utils import prompt_yes_no
 
 
 def main():
     project_path = Path(input("Enter the path to the project: ").strip())
+    update_json = prompt_yes_no(
+        "Do you want to delete unused packages from the package.json?"
+    )
     repo_name = os.path.basename(project_path)
 
     if not project_path.exists() or not project_path.is_dir():
@@ -42,12 +47,17 @@ def main():
 
     pb.finish()
 
+    # Create table
     table = create_table(dependency_counts)
     print(table)
 
     # Create excel file
     output_path = f"output/{repo_name}_dep_counts.xlsx"
     create_excel_file(output_path, table)
+
+    # Update package.json
+    if update_json:
+        update_package_json(project_path, dependency_counts)
 
     print("------------------------------------")
     print("Done!")

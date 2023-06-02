@@ -6,7 +6,7 @@ def get_package_dependencies(project_path: str):
     package_json_path = project_path / "package.json"
     with open(package_json_path) as file:
         package_json_data = json.load(file)
-        return package_json_data["dependencies"]
+        return package_json_data.get("dependencies", {})
 
 
 def find_files(project_path: str):

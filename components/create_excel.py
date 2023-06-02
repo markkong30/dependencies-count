@@ -27,7 +27,7 @@ def create_excel_file(file_path: str, table: pd.DataFrame):
     workbook.save(file_path)
 
 
-def create_table(dependency_counts):
+def create_table(dependency_counts: dict):
     df = pd.DataFrame.from_dict(dependency_counts, orient="index", columns=["Count"])
     df.index.name = "Dependency"
     df_sorted = df.sort_values("Count", ascending=False)
