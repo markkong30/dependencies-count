@@ -10,7 +10,7 @@ from components.create_excel import (
     create_table,
 )
 from components.update_json import update_package_json
-from components.utils import prompt_yes_no
+from components.utils import prompt_yes_no, open_file
 
 
 def main():
@@ -58,6 +58,12 @@ def main():
     # Update package.json
     if update_json:
         update_package_json(project_path, dependency_counts)
+
+    # Open Excel file
+    try:
+        open_file(output_path)
+    except:
+        pass
 
     print("------------------------------------")
     print("Done!")
