@@ -15,9 +15,6 @@ from components.utils import prompt_yes_no, open_file
 
 def main():
     project_path = Path(input("Enter the path to the project: ").strip())
-    update_json = prompt_yes_no(
-        "Do you want to delete unused packages from the package.json?"
-    )
     repo_name = os.path.basename(project_path)
 
     if not project_path.exists() or not project_path.is_dir():
@@ -56,12 +53,18 @@ def main():
     create_excel_file(output_path, table)
 
     # Update package.json
+    update_json = prompt_yes_no(
+        "Do you want to remove unused packages from the package.json?"
+    )
+
     if update_json:
         update_package_json(project_path, dependency_counts)
 
     # Open Excel file
     try:
-        open_file(output_path)
+        open_excel = prompt_yes_no("Do you want to open the Excel file?")
+        if open_excel:
+            open_file(output_path)
     except:
         pass
 
