@@ -1,0 +1,7 @@
+.DS_Store
+venv
+*.pyc
+__pycache__/
+.env
+.xlxs
+*_dep_counts.xlsx
