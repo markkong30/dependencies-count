@@ -6,25 +6,26 @@ import openpyxl
 
 
 def create_excel_file(file_path: str, table: pd.DataFrame):
-    # Create the directory if it doesn't exist
-    directory = os.path.dirname(file_path)
-    if not os.path.exists(directory):
-        os.makedirs(directory)
+    try:
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        table.to_excel(file_path)
 
-    # Save table to excel file
-    table.to_excel(file_path)
+        # Create horizontal bar chart
+        workbook = openpyxl.load_workbook(file_path)
+        sheet = workbook.active
+        create_horizontal_bar_chart(sheet, table)
 
-    # Create horizontal bar chart
-    workbook = openpyxl.load_workbook(file_path)
-    sheet = workbook.active
+        # Adjust column widths
+        sheet.column_dimensions["A"].width = 30  # Set width for dependencies column
+        sheet.column_dimensions["B"].width = 10  # Set width for count column
 
-    create_horizontal_bar_chart(sheet, table)
+        workbook.save(file_path)
+        print("------------------------------------")
+        print(f"Excel file saved successfully.")
+        print("------------------------------------")
 
-    # Adjust column widths
-    sheet.column_dimensions["A"].width = 30  # Set width for dependencies column
-    sheet.column_dimensions["B"].width = 10  # Set width for count column
-
-    workbook.save(file_path)
+    except Exception as e:
+        print(f"Error saving Excel file: {e}")
 
 
 def create_table(dependency_counts: dict):

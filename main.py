@@ -14,62 +14,71 @@ from components.utils import prompt_yes_no, open_file
 
 
 def main():
-    project_path = Path(input("Enter the path to the project: ").strip())
-    repo_name = os.path.basename(project_path)
-
-    if not project_path.exists() or not project_path.is_dir():
-        sys.exit(f"{project_path} is not a valid directory")
-
-    dependencies = get_package_dependencies(project_path)
-
-    dependency_counts = {}
-    for dependency in dependencies:
-        dependency_counts[dependency] = 0
-
-    entries = find_files(project_path)
-    total_progress = len(entries)
-
-    pb = IncrementalBar("Processing", max=total_progress)
-
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        futures = []
-        for entry in entries:
-            future = executor.submit(process_file, entry, dependency_counts)
-            futures.append(future)
-            pb.next()
-
-        # Wait for all tasks to complete
-        for future in concurrent.futures.as_completed(futures):
-            future.result()
-
-    pb.finish()
-
-    # Create table
-    table = create_table(dependency_counts)
-    print(table)
-
-    # Create excel file
-    output_path = f"output/{repo_name}_dep_counts.xlsx"
-    create_excel_file(output_path, table)
-
-    # Update package.json
-    update_json = prompt_yes_no(
-        "Do you want to remove unused packages from the package.json?"
-    )
-
-    if update_json:
-        update_package_json(project_path, dependency_counts)
-
-    # Open Excel file
     try:
-        open_excel = prompt_yes_no("Do you want to open the Excel file?")
-        if open_excel:
-            open_file(output_path)
-    except:
-        pass
+        project_path = Path(input("Enter the path to the project: ").strip())
+        repo_name = os.path.basename(project_path)
 
-    print("------------------------------------")
-    print("Done!")
+        if not project_path.exists() or not project_path.is_dir():
+            sys.exit(f"{project_path} is not a valid directory")
+
+        dependencies = get_package_dependencies(project_path)
+
+        dependency_counts = {}
+        for dependency in dependencies:
+            dependency_counts[dependency] = 0
+
+        entries = find_files(project_path)
+        total_progress = len(entries)
+
+        pb = IncrementalBar("Processing", max=total_progress)
+
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            futures = []
+            for entry in entries:
+                future = executor.submit(process_file, entry, dependency_counts)
+                futures.append(future)
+                pb.next()
+
+            # Wait for all tasks to complete
+            for future in concurrent.futures.as_completed(futures):
+                future.result()
+
+        pb.finish()
+
+        # Create table
+        table = create_table(dependency_counts)
+        print(table)
+
+        # Create excel file
+        output_path = f"output/{repo_name}_dep_counts.xlsx"
+        create_excel_file(output_path, table)
+
+        # Update package.json
+        update_json = prompt_yes_no(
+            "Do you want to remove unused packages from the package.json?"
+        )
+
+        if update_json:
+            warning = prompt_yes_no(
+                "Please be minded that you are potentially using them as dev dependencies. Are you sure to remove them?"
+            )
+            if warning:
+                update_package_json(project_path, dependency_counts)
+
+        # Open Excel file
+        try:
+            open_excel = prompt_yes_no("Do you want to open the Excel file?")
+
+            if open_excel:
+                open_file(output_path)
+        except:
+            pass
+
+        print("------------------------------------")
+        print("Done!")
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
 
 if __name__ == "__main__":

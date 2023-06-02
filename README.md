@@ -31,7 +31,7 @@ pip install -r requirements.txt
 
 To use the tool, navigate to the `main.py` and run the script.
 
-You will be prompted to provide the root project path, and an option to update the package.json by removing unused dependencies automatically. Please be sure that you are not using them as dev dependencies before removing them.
+You will be prompted to provide the root project path, and an option to update the package.json by removing unused dependencies automatically. **_(Please be minded that you are potentially using them as dev dependencies)_**
 
 The tool will search the project directory and its subdirectories for JavaScript and TypeScript files, and count the number of times each dependency is imported.
 
