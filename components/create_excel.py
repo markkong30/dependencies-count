@@ -8,6 +8,8 @@ import openpyxl
 def create_excel_file(file_path: str, table: pd.DataFrame):
     try:
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
+        # Add table to Excel file
         table.to_excel(file_path)
 
         # Create horizontal bar chart
@@ -20,6 +22,8 @@ def create_excel_file(file_path: str, table: pd.DataFrame):
         sheet.column_dimensions["B"].width = 10  # Set width for count column
 
         workbook.save(file_path)
+        workbook.close()
+
         print("------------------------------------")
         print(f"Excel file saved successfully.")
         print("------------------------------------")

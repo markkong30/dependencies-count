@@ -59,10 +59,10 @@ def main():
         )
 
         if update_json:
-            warning = prompt_yes_no(
+            confirm_update = prompt_yes_no(
                 "Please be minded that you are potentially using them as dev dependencies. Are you sure to remove them?"
             )
-            if warning:
+            if confirm_update:
                 update_package_json(project_path, dependency_counts)
 
         # Open Excel file
