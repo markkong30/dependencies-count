@@ -5,6 +5,13 @@ from openpyxl.chart.label import DataLabelList
 import openpyxl
 
 
+def create_table(dependency_counts: dict):
+    df = pd.DataFrame.from_dict(dependency_counts, orient="index", columns=["Count"])
+    df.index.name = "Dependency"
+    df_sorted = df.sort_values("Count", ascending=False)
+    return df_sorted
+
+
 def create_excel_file(file_path: str, table: pd.DataFrame):
     try:
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
@@ -17,10 +24,17 @@ def create_excel_file(file_path: str, table: pd.DataFrame):
         sheet = workbook.active
         create_horizontal_bar_chart(sheet, table)
 
+        # Enable sorting
+        table_range = f"A1:B{len(table)+1}"
+        data_range = f"B2:B{len(table)+1}"
+        sheet.auto_filter.ref = table_range
+        sheet.auto_filter.add_sort_condition(data_range)
+
         # Adjust column widths
         sheet.column_dimensions["A"].width = 30  # Set width for dependencies column
         sheet.column_dimensions["B"].width = 10  # Set width for count column
 
+        # Save Excel file
         workbook.save(file_path)
         workbook.close()
 
@@ -30,13 +44,6 @@ def create_excel_file(file_path: str, table: pd.DataFrame):
 
     except Exception as e:
         print(f"Error saving Excel file: {e}")
-
-
-def create_table(dependency_counts: dict):
-    df = pd.DataFrame.from_dict(dependency_counts, orient="index", columns=["Count"])
-    df.index.name = "Dependency"
-    df_sorted = df.sort_values("Count", ascending=False)
-    return df_sorted
 
 
 def create_horizontal_bar_chart(sheet, table):
